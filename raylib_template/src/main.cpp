@@ -427,11 +427,13 @@ int main()
             // selectedPiece.MoveToPosition(&moveFromTo, c.chessPieces);
             for(auto i = 0; i < 32; i++){
                 if(pieces[i].cp->position.x == s_piece.s_pos.x && pieces[i].cp->position.y == s_piece.s_pos.y){
-                    pieces[i].cp->position = moveFromTo;
-                    // s_piece.s_pos.x = moveFromTo.x;
-                    // s_piece.s_pos.y = moveFromTo.y;
-                    index = i;
-                    // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+                    if(pieces[i].cp->validityCheck(&moveFromTo, c.chessPieces)){
+                        pieces[i].cp->position = moveFromTo;
+                        s_piece.s_pos.x = moveFromTo.x;
+                        s_piece.s_pos.y = moveFromTo.y;
+                        index = i;
+                        // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+                    }
                     break;
                 }
             }
@@ -440,8 +442,9 @@ int main()
                 s_piece.s_rect.x = s_piece.s_pos.y * tile_size; //s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
                 s_piece.s_rect.y = s_piece.s_pos.x * tile_size; //s_piece.s_rect.y = s_piece.s_pos.x * tile_size; 
 
-                destRects[index].x = pieces[index].cp->position.y * tile_size;
-                destRects[index].y = pieces[index].cp->position.x * tile_size;
+                destRects[index].x = s_piece.s_rect.x; // destRects[index].x = pieces[index].cp->position.y * tile_size;
+                destRects[index].y = s_piece.s_rect.y; // destRects[index].y = pieces[index].cp->position.x * tile_size;
+                
                 // for(auto i = 0; i < 32; i++){
                 //     if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
                 //         printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
@@ -459,11 +462,31 @@ int main()
             else{
                 destRects[index].x = originalValues.y * tile_size;
                 destRects[index].y = originalValues.x * tile_size;
+                s_piece.s_rect.x = originalValues.y * tile_size;
+                s_piece.s_rect.y = originalValues.x * tile_size;
             }
             // printf("s_piece rect = (%f,%f,%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x, s_piece.s_rect.width, s_piece.s_rect.height);
             // for(auto i : destRects){
             //     printf("pieces dr = (%f,%f,%f,%f)\n", i.y, i.x, i.width, i.height);
             // }
+            if((s_piece.s_pos.x != originalValues.x || s_piece.s_pos.y != originalValues.y)){ // && !king.isValidMove(&moveFromTo,c.chessPieces)){ 
+                std:: cout << "HELLO" << std::endl;
+                s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
+                s_piece.s_rect.y = s_piece.s_pos.x * tile_size;
+                for(auto i = 0; i < 32; i++){
+                    if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
+                        printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
+                        destRects[i].x = s_piece.s_rect.x;
+                        destRects[i].y = s_piece.s_rect.y;
+                        index = i;
+                        // printf("i = %d; (%d,%d)", i, pieces[i].dr.x, pieces[i].dr.y);
+                        // s_piece.s_pos.x = moveFromTo.x;
+                        // s_piece.s_pos.y = moveFromTo.y;
+                        // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+                        break;
+                    }
+                }
+            }
         }        
 
         //RenderChessPieces(sourceRect, destRect, image);
