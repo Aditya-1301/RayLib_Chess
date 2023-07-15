@@ -9,7 +9,7 @@ class King : public ChessPiece{
             this->isWhite = isWhite;
             this->type = PieceType::KING;
             this->pieceRectangle = { (float)(position).y*tile_size, (float)(position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
-            chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 4 : 20; 
+            this->pieceID = (isWhite)? 4 : 28; 
             sprintf(chessBoard.chessPieces[position.x][position.y], "K_%c", (isWhite) ? 'W' : 'B');
             // chessBoard.printBoardState();
         }

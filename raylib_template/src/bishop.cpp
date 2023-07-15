@@ -9,10 +9,10 @@ class Bishop : public ChessPiece{
             this->isWhite = isWhite;
             this->type = PieceType::BISHOP;
             if((this->position).y == 2){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 3 : 19;
+                this->pieceID = (isWhite)? 3 : 27;
             }
             else if((this->position).y == 5){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 6 : 22;
+                this->pieceID = (isWhite)? 6 : 30;
             }
             this->pieceRectangle = { (float)(this->position).y*tile_size, (float)(this->position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
             sprintf(chessBoard.chessPieces[position.x][position.y], "B_%c", (isWhite) ? 'W' : 'B');

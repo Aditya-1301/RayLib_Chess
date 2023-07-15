@@ -6,18 +6,16 @@ class Rook : public ChessPiece{
         Rook(Position position, bool isWhite, ChessBoard &chessBoard){
             this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\w_rook_2x_ns.png") : LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\b_rook_2x_ns.png");
             this->position = position;
-            // position = (isWhite)? Position(0,7) : Position(7,0); 
             this->isWhite = isWhite;
             this->type = PieceType::ROOK;
             if((this->position).y == 0){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 1 : 17;
+                this->pieceID = (isWhite)? 1 : 25;
             }
             else if((this->position).y == 7){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 8 : 24;
+                this->pieceID = (isWhite)? 8 : 32;
             }
             this->pieceRectangle = { (float)(this->position).y*tile_size, (float)(this->position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
             sprintf(chessBoard.chessPieces[position.x][position.y], "R_%c", (isWhite) ? 'W' : 'B');
-            // chessBoard.printBoardState();
         }
 
         bool isValidMove(Position * position, char chessPieces [ROWS][COLUMNS][4]) override{

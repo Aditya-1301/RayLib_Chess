@@ -5,19 +5,16 @@ class Knight : public ChessPiece{
         Knight(Position position, bool isWhite, ChessBoard &chessBoard){
             this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\w_knight_2x_ns.png") : LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\b_knight_2x_ns.png");
             this->position = position;
-            // position = (isWhite)? Position(0,1) : Position(7,6); 
             this->isWhite = isWhite;
-            
             this->type = PieceType::KNIGHT;
             if((this->position).y == 1){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 2 : 18;
+                this->pieceID = (isWhite)? 2 : 26;
             }
             else if((this->position).y == 6){
-                chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite)? 7 : 23;
+                this->pieceID = (isWhite)? 7 : 31;
             }
             this->pieceRectangle = { (float)(this->position).y*tile_size, (float)(this->position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
             sprintf(chessBoard.chessPieces[position.x][position.y], "Kn%c", (isWhite) ? 'W' : 'B');
-            // chessBoard.printBoardState();
         }
 
         bool isValidMove(Position * position, char chessPieces [ROWS][COLUMNS][4]) override{

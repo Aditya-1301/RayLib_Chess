@@ -8,7 +8,7 @@ class Queen : public ChessPiece{
             // position = (isWhite)? Position(0,4) : Position(7,4); 
             this->isWhite = isWhite;
             this->type = PieceType::QUEEN;
-            chessBoard.pieceIDs[(this->position).x][(this->position).y] = (isWhite) ? 5 : 21;
+            this->pieceID = (isWhite) ? 5 : 29;
             this->pieceRectangle = { (float)(this->position).y*tile_size, (float)(this->position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
             sprintf(chessBoard.chessPieces[position.x][position.y], "Q_%c", (isWhite) ? 'W' : 'B');
             // chessBoard.printBoardState();
