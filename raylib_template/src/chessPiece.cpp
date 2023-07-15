@@ -38,4 +38,21 @@ class ChessPiece{
         }
 
         virtual void MoveToPosition(Position * position, char chessPieces [ROWS][COLUMNS][4]) = 0;
+        std::string getType(){
+            switch (this->type)
+            {
+            case KING:
+                return "King";
+            case QUEEN:
+                return "Queen";
+            case ROOK:
+                return "Rook";
+            case KNIGHT:
+                return "Knight";
+            case BISHOP:
+                return "Bishop";
+            case PAWN:
+                return "Pawn";
+            }
+        } 
 };
