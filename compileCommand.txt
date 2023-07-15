@@ -1,0 +1,2 @@
+To compile : root folder> g++ src/main.cpp -I include -L lib -lraylib -lopengl32 -lgdi32 -lwinmm
+To run : Then just double click on the a.exe file through file explorer and you're done.
