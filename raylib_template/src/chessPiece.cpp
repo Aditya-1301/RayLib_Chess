@@ -51,40 +51,34 @@ class ChessPiece{
             this->position.y = y;
         }
 
-        virtual bool isValidMove(Position * position) = 0; //{
-            // // std :: cout << "entered" << std :: endl;
-            // // return validityCheck(position);
-            // switch (this->type)
-            // {
-            //     case KING:
-            //         std :: cout << "works" << std :: endl;
-            //         return kingCheck(position);
-            //     case QUEEN:
-            //         std :: cout << "works" << std :: endl;
-            //         return queenCheck(position);
-            //     case ROOK:
-            //         std :: cout << "works" << std :: endl;
-            //         return rookCheck(position);
-            //     case KNIGHT:
-            //         std :: cout << "works" << std :: endl;
-            //         return knightCheck(position);
-            //     case BISHOP:
-            //         std :: cout << "works" << std :: endl;
-            //         return bishopCheck(position);
-            //     case PAWN:
-            //         std :: cout << "works" << std :: endl;
-            //         return pawnCheck(position);
-        //     }
-        // }
+        virtual bool isValidMove(Position * position) {
+            switch (this->type)
+            {
+                case KING:
+                    std :: cout << "works" << std :: endl;
+                    return kingCheck(position);
+                case QUEEN:
+                    std :: cout << "works" << std :: endl;
+                    return queenCheck(position);
+                case ROOK:
+                    std :: cout << "works" << std :: endl;
+                    return rookCheck(position);
+                case KNIGHT:
+                    std :: cout << "works" << std :: endl;
+                    return knightCheck(position);
+                case BISHOP:
+                    std :: cout << "works" << std :: endl;
+                    return bishopCheck(position);
+                case PAWN:
+                    std :: cout << "works" << std :: endl;
+                    return pawnCheck(position);
+            }
+        }
 
         void MoveToPosition(Position * position){
             printf("Current Position: %d, %d\n", (this->position).x, (this->position).y);
             printf("Target Position: %d, %d\n", position->x, position->y);
             setPosition(position->x, position->y);
-            // if(isValidMove(position)){
-            //     setPosition(position->x, position->y);
-            // }
-            // else printf("Invalid Move\n");
         }
 
 
@@ -258,9 +252,6 @@ class ChessPiece{
             for (auto possiblePosition: possiblePositions) {
                 if(possiblePosition.x == position->x && possiblePosition.y == position->y){
                     return true;
-                }
-                else{
-                    return false;
                 }
             }
             return false;
