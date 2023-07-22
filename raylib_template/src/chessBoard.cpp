@@ -4,6 +4,7 @@ class ChessBoard{
     public:
         bool board[ROWS][COLUMNS];
         char chessPieces[ROWS][COLUMNS][4];
+        int pieceIDs [ROWS][COLUMNS];
         Rectangle tiles [ROWS][COLUMNS];
 
         ChessBoard(){
@@ -15,6 +16,11 @@ class ChessBoard{
             for (int i = 0; i < ROWS; i++) {
                 for (int j = 0; j < COLUMNS; j++) {
                     board[i][j] = ((i+j)%2) == 0;
+                }
+            }
+            for(auto i = 0; i < ROWS; i++){
+                for(auto j = 0; j < ROWS; j++){
+                    pieceIDs[i][j] = 0; 
                 }
             }
             for (auto i = 0; i < ROWS; i++)

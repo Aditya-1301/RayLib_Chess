@@ -1264,6 +1264,18 @@
 			],
 			"type" : "STATIC",
 			"value" : "D:/RayLib/Chess"
+		},
+		{
+			"name" : "RAYLIB_LIBRARY",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to a library."
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "D:/RayLib/Chess/raylib_template/lib/libraylib.a"
 		}
 	],
 	"kind" : "cache",

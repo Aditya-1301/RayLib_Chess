@@ -11,7 +11,7 @@ bool getClickOnTile(Position * position, Rectangle * tile);
 
 struct piece{
         ChessPiece * cp;
-        Rectangle dr;
+        Rectangle * dr;
     };
 
 typedef struct piece c_pieces;
@@ -23,9 +23,10 @@ struct Selected{
 typedef struct Selected selected;
 
 selected s_piece;
+
+ChessPiece * selectedPiece = nullptr;
+int index;
 Position moveFromTo;
-// Vector2 mousePosition = GetMousePosition();
-// Position originalValues = Position(s_piece.s_pos.x, s_piece.s_pos.y); 
 
 void boardColorsSet(std::vector<std::vector<Color>>& boardColors){
     Vector2 mousePos = GetMousePosition();
@@ -75,7 +76,7 @@ bool getClickWithChessPieces(ChessPiece * chessPiece, ChessBoard chessBoard, Rec
     if (isMouseClickedOnImage)
     {
         std :: cout << chessPiece -> getType() << std:: endl;
-        s_piece = {chessPiece->position, destRect};
+        s_piece = {Position(chessPiece->position.x, chessPiece->position.y), destRect};
         printf("s_piece : (%f, %f) ; (%f, %f, %f, %f)", s_piece.s_pos.x, s_piece.s_pos, s_piece.s_rect.x, s_piece.s_rect.y, s_piece.s_rect.width, s_piece.s_rect.height);
         return true;
     }
@@ -100,6 +101,71 @@ bool getClickOnTile(ChessBoard c){ //Rectangle * tile
         }
     }
     return false;
+}
+
+void checkMoveValidityForSelectedPiece(c_pieces pieces[], Position dest) {
+    if (selectedPiece) {
+        printf("Is Valid: %d\n", selectedPiece->validityCheck(&dest));
+        // Call the specific move validity check for the selected piece
+        if (selectedPiece->validityCheck(&dest)) { //selectedPiece->isValidMove(&dest)
+            // The move is valid, update the piece's position on the chessboard
+            selectedPiece->MoveToPosition(&dest);
+            pieces[index].dr->x = selectedPiece->position.y * tile_size;
+            pieces[index].dr->y = selectedPiece->position.x * tile_size;
+        } else {
+            std::cout << "INVALID MOVE: " + selectedPiece->getType() << std::endl;
+            // Handle the invalid move appropriately (e.g., show an error message)
+            pieces[index].dr->x = selectedPiece->position.y * tile_size; // Reset position to original
+            pieces[index].dr->y = selectedPiece->position.x * tile_size;
+        }
+
+        // Deselect the piece after checking its move validity
+        selectedPiece->setSelected(false);
+        selectedPiece = nullptr; // Reset selectedPiece after the move
+    }
+}
+
+void handleChessPieceSelection(c_pieces pieces[], Vector2 offset) {
+    Vector2 mousePosition = GetMousePosition();
+    
+    // Deselect all pieces first
+    for (int i = 0; i < 32; ++i) {
+        pieces[i].cp->setSelected(false);
+    }
+
+    // Check for mouse click on any piece and select it
+    for (int i = 0; i < 32; ++i) {
+        // Rectangle imageBounds = { pieces[i].dr.x, pieces[i].dr.y, pieces[i].dr.width, pieces[i].dr.height };
+        bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, *pieces[i].dr);
+
+        if (isMouseClickedOnImage) {
+            // Check if left mouse button is pressed
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                std :: cout << pieces[i].cp -> getType() << std:: endl;
+                pieces[i].cp->setSelected(true);
+                selectedPiece = pieces[i].cp;
+                index = i;
+                offset.x = mousePosition.x - pieces[i].dr->x;
+                offset.y = mousePosition.y - pieces[i].dr->y;
+                printf("Index i : %d \n",index);
+                printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
+                printf("Offset : (%f, %f)\n", offset.x, offset.y);
+                break; // Break the loop after selecting one piece
+            }
+        }
+    }
+
+    // Update position if dragging
+    if (selectedPiece && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        selectedPiece->setSelected(true);
+        pieces[index].dr->x = mousePosition.x - offset.x;
+        pieces[index].dr->y = mousePosition.y - offset.y;
+        printf("Pieces Rectangle (%f,%f)\n", pieces[index].dr->y, pieces[index].dr->x);
+    } 
+    else if (selectedPiece && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+        // selectedPiece = nullptr; // Reset selectedPiece if not dragging
+        checkMoveValidityForSelectedPiece(pieces, Position(mousePosition.y / tile_size, mousePosition.x / tile_size));
+    }
 }
 
 void dragPiece(bool isDragging, Vector2 offset, int index, c_pieces pieces[], Rectangle destRects []){
@@ -156,7 +222,7 @@ void dragPiece(bool isDragging, Vector2 offset, int index, c_pieces pieces[], Re
             s_piece.s_rect.y = s_piece.s_pos.x * tile_size;
             for(auto i = 0; i < 32; i++){
                 if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
-                    printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
+                    printf("i = %d; (%f,%f)", i, pieces[i].dr->x, pieces[i].dr->y);
                     destRects[i].x = s_piece.s_rect.x;
                     destRects[i].y = s_piece.s_rect.y;
                     index = i;
@@ -276,11 +342,11 @@ int main()
 
 
     Rectangle sourceRectKing = { 0, 0, kingWImage.width, kingWImage.height };  // Entire image
-    Rectangle sourceRectQueen = { 0, 0, queenWImage.width, queenWImage.height }; 
-    Rectangle sourceRectRook = { 0, 0, rookWImage.width, rookWImage.height }; 
-    Rectangle sourceRectBishop = { 0, 0, bishopWImage.width, bishopWImage.height }; 
-    Rectangle sourceRectKnight = { 0, 0, knightWImage.width, knightWImage.height }; 
-    Rectangle sourceRectPawn = { 0, 0, pawnWImage.width, pawnWImage.height }; 
+    Rectangle sourceRectQueen = { 0, 0, queenWImage.width, queenWImage.height };
+    Rectangle sourceRectRook = { 0, 0, rookWImage.width, rookWImage.height };
+    Rectangle sourceRectBishop = { 0, 0, bishopWImage.width, bishopWImage.height };
+    Rectangle sourceRectKnight = { 0, 0, knightWImage.width, knightWImage.height };
+    Rectangle sourceRectPawn = { 0, 0, pawnWImage.width, pawnWImage.height };
 
     Rectangle destRects [] = {
         { king.position.y*tile_size, king.position.x*tile_size, kingWImage.width / 10, kingWImage.height / 10 },
@@ -328,39 +394,39 @@ int main()
     }
 
     c_pieces pieces [] = { //destRects
-        {&king, destRects[0]},
-        {&queen, destRects[1]},
-        {&rook1, destRects[2]},
-        {&rook2, destRects[3]},
-        {&knight1, destRects[4]},
-        {&knight2, destRects[5]},
-        {&bishop1, destRects[6]},
-        {&bishop2, destRects[7]},
-        {&pawn1, destRects[8]},
-        {&pawn2, destRects[9]},
-        {&pawn3, destRects[10]},
-        {&pawn4, destRects[11]},
-        {&pawn5, destRects[12]},
-        {&pawn6, destRects[13]},
-        {&pawn7, destRects[14]},
-        {&pawn8, destRects[15]},
+        {&king, &destRects[0]},
+        {&queen, &destRects[1]},
+        {&rook1, &destRects[2]},
+        {&rook2, &destRects[3]},
+        {&knight1, &destRects[4]},
+        {&knight2, &destRects[5]},
+        {&bishop1, &destRects[6]},
+        {&bishop2, &destRects[7]},
+        {&pawn1, &destRects[8]},
+        {&pawn2, &destRects[9]},
+        {&pawn3, &destRects[10]},
+        {&pawn4, &destRects[11]},
+        {&pawn5, &destRects[12]},
+        {&pawn6, &destRects[13]},
+        {&pawn7, &destRects[14]},
+        {&pawn8, &destRects[15]},
 
-        {&king2, destRects[16]},
-        {&queen2, destRects[17]},
-        {&rook3, destRects[18]},
-        {&rook4, destRects[19]},
-        {&knight3, destRects[20]},
-        {&knight4, destRects[21]},
-        {&bishop3, destRects[22]},
-        {&bishop4, destRects[23]},
-        {&pawn9, destRects[24]},
-        {&pawn10, destRects[25]},
-        {&pawn11, destRects[26]},
-        {&pawn12, destRects[27]},
-        {&pawn13, destRects[28]},
-        {&pawn14, destRects[29]},
-        {&pawn15, destRects[30]},
-        {&pawn16, destRects[31]}
+        {&king2, &destRects[16]},
+        {&queen2, &destRects[17]},
+        {&rook3, &destRects[18]},
+        {&rook4, &destRects[19]},
+        {&knight3, &destRects[20]},
+        {&knight4, &destRects[21]},
+        {&bishop3, &destRects[22]},
+        {&bishop4, &destRects[23]},
+        {&pawn9, &destRects[24]},
+        {&pawn10, &destRects[25]},
+        {&pawn11, &destRects[26]},
+        {&pawn12, &destRects[27]},
+        {&pawn13, &destRects[28]},
+        {&pawn14, &destRects[29]},
+        {&pawn15, &destRects[30]},
+        {&pawn16, &destRects[31]}
     };
 
     for(auto i : destRects){
@@ -369,7 +435,7 @@ int main()
 
    bool isDragging = false;
    Vector2 offset = { 0, 0 };
-   int index = 0;
+//    int index = 0;
 
     while (!WindowShouldClose())
     {
@@ -379,115 +445,116 @@ int main()
         
         RenderChessBoard();
 
-        for(auto piece : pieces){
-            if(getClickWithChessPieces(piece.cp, c, piece.dr)){
-                printf("piecesRect = (%d,%d,%d,%d)\n", piece.dr.x, piece.dr.y, piece.dr.width, piece.dr.height);
-                std :: cout << "Is Working" << std :: endl;
-            }
-        }
+        handleChessPieceSelection(pieces, offset);
+
+        // for(auto piece : pieces){
+        //     if(getClickWithChessPieces(piece.cp, c, piece.dr)){
+        //         printf("piecesRect = (%d,%d,%d,%d)\n", piece.dr.x, piece.dr.y, piece.dr.width, piece.dr.height);
+        //         std :: cout << "Is Working" << std :: endl;
+        //     }
+        // }
 
         // dragPiece(isDragging, offset, index, pieces, destRects);
 
-        Vector2 mousePosition = GetMousePosition();
-        Position originalValues = Position(s_piece.s_pos.x, s_piece.s_pos.y); 
+        // Vector2 mousePosition = GetMousePosition();
+        // Position originalValues = Position(s_piece.s_pos.x, s_piece.s_pos.y); 
 
-        // Check if mouse is inside the image
-        if (CheckCollisionPointRec(mousePosition, s_piece.s_rect))
-        {
-            // Check if left mouse button is pressed
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-            {
-                isDragging = true;
-                offset.x = mousePosition.x - s_piece.s_rect.x;
-                offset.y = mousePosition.y - s_piece.s_rect.y;
-            }
-        }
+        // // Check if mouse is inside the image
+        // if (CheckCollisionPointRec(mousePosition, s_piece.s_rect))
+        // {
+        //     // Check if left mouse button is pressed
+        //     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        //     {
+        //         isDragging = true;
+        //         offset.x = mousePosition.x - s_piece.s_rect.x;
+        //         offset.y = mousePosition.y - s_piece.s_rect.y;
+        //     }
+        // }
         
-        // Update position if dragging
-        if (isDragging)
-        {
-            printf("rect : (%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x);
-            s_piece.s_rect.x = mousePosition.x - offset.x;
-            s_piece.s_rect.y = mousePosition.y - offset.y;
-            // printf("offset: (%f, %f)\n", offset.x, offset.y);
-            // printf("new rect : (%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x);
-            s_piece.s_pos.x = originalValues.x;
-            s_piece.s_pos.y = originalValues.y;
-            moveFromTo.x = (float)(mousePosition.y/tile_size);
-            moveFromTo.y= (float)(mousePosition.x/tile_size);
-        } 
+        // // Update position if dragging
+        // if (isDragging)
+        // {
+        //     printf("rect : (%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x);
+        //     s_piece.s_rect.x = mousePosition.x - offset.x;
+        //     s_piece.s_rect.y = mousePosition.y - offset.y;
+        //     // printf("offset: (%f, %f)\n", offset.x, offset.y);
+        //     // printf("new rect : (%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x);
+        //     s_piece.s_pos.x = originalValues.x;
+        //     s_piece.s_pos.y = originalValues.y;
+        //     moveFromTo.x = (float)(mousePosition.y/tile_size);
+        //     moveFromTo.y= (float)(mousePosition.x/tile_size);
+        // } 
 
-        // Check if left mouse button is released
-        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-        {
-            isDragging = false;
-            // printf("Dest:(%d,%d)\n",(int)(mousePosition.y/tile_size),(int)(mousePosition.x/tile_size));
-            printf("Dest:(%d,%d)\n",moveFromTo.x,moveFromTo.y);
-            printf("Selected Piece's Position : (%d, %d)\n", s_piece.s_pos.x, s_piece.s_pos.y);
-            // selectedPiece.MoveToPosition(&moveFromTo, c.chessPieces);
-            for(auto i = 0; i < 32; i++){
-                if(pieces[i].cp->position.x == s_piece.s_pos.x && pieces[i].cp->position.y == s_piece.s_pos.y){
-                    if(pieces[i].cp->validityCheck(&moveFromTo, c.chessPieces)){
-                        pieces[i].cp->position = moveFromTo;
-                        s_piece.s_pos.x = moveFromTo.x;
-                        s_piece.s_pos.y = moveFromTo.y;
-                        index = i;
-                        // printf("piece pos: (%d,%d)", pieces[i].cp->position);
-                    }
-                    break;
-                }
-            }
-            if((pieces[index].cp->position.x != originalValues.x || pieces[index].cp->position.y != originalValues.y)){ //(s_piece.s_pos.x != originalValues.x || s_piece.s_pos.y != originalValues.y)
-                std:: cout << "HELLO" << std::endl; //pieces[index].cp->position.
-                s_piece.s_rect.x = s_piece.s_pos.y * tile_size; //s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
-                s_piece.s_rect.y = s_piece.s_pos.x * tile_size; //s_piece.s_rect.y = s_piece.s_pos.x * tile_size; 
+        // // Check if left mouse button is released
+        // if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+        // {
+        //     isDragging = false;
+        //     // printf("Dest:(%d,%d)\n",(int)(mousePosition.y/tile_size),(int)(mousePosition.x/tile_size));
+        //     printf("Dest:(%d,%d)\n",moveFromTo.x,moveFromTo.y);
+        //     printf("Selected Piece's Position : (%d, %d)\n", s_piece.s_pos.x, s_piece.s_pos.y);
+        //     // selectedPiece.MoveToPosition(&moveFromTo, c.chessPieces);
+        //     for(auto i = 0; i < 32; i++){
+        //         if(pieces[i].cp->position.x == s_piece.s_pos.x && pieces[i].cp->position.y == s_piece.s_pos.y){
+        //             if(pieces[i].cp->validityCheck(&moveFromTo, c)){
+        //                 pieces[i].cp->position = moveFromTo;
+        //                 s_piece.s_pos.x = moveFromTo.x;
+        //                 s_piece.s_pos.y = moveFromTo.y;
+        //                 index = i;
+        //                 // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+        //             }
+        //             break;
+        //         }
+        //     }
+        //     if((pieces[index].cp->position.x != originalValues.x || pieces[index].cp->position.y != originalValues.y)){ //(s_piece.s_pos.x != originalValues.x || s_piece.s_pos.y != originalValues.y)
+        //         std::cout << "HELLO" << std::endl; //pieces[index].cp->position.
+        //         s_piece.s_rect.x = s_piece.s_pos.y * tile_size; //s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
+        //         s_piece.s_rect.y = s_piece.s_pos.x * tile_size; //s_piece.s_rect.y = s_piece.s_pos.x * tile_size; 
 
-                destRects[index].x = s_piece.s_rect.x; // destRects[index].x = pieces[index].cp->position.y * tile_size;
-                destRects[index].y = s_piece.s_rect.y; // destRects[index].y = pieces[index].cp->position.x * tile_size;
-                
-                // for(auto i = 0; i < 32; i++){
-                //     if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
-                //         printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
-                //         destRects[i].x = s_piece.s_rect.x;
-                //         destRects[i].y = s_piece.s_rect.y;
-                //         index = i;
-                //         // printf("i = %d; (%d,%d)", i, pieces[i].dr.x, pieces[i].dr.y);
-                //         // s_piece.s_pos.x = moveFromTo.x;
-                //         // s_piece.s_pos.y = moveFromTo.y;
-                //         // printf("piece pos: (%d,%d)", pieces[i].cp->position);
-                //         break;
-                //     }
-                // }
-            }
-            else{
-                destRects[index].x = originalValues.y * tile_size;
-                destRects[index].y = originalValues.x * tile_size;
-                s_piece.s_rect.x = originalValues.y * tile_size;
-                s_piece.s_rect.y = originalValues.x * tile_size;
-            }
-            // printf("s_piece rect = (%f,%f,%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x, s_piece.s_rect.width, s_piece.s_rect.height);
-            // for(auto i : destRects){
-            //     printf("pieces dr = (%f,%f,%f,%f)\n", i.y, i.x, i.width, i.height);
-            // }
-            if((s_piece.s_pos.x != originalValues.x || s_piece.s_pos.y != originalValues.y)){ // && !king.isValidMove(&moveFromTo,c.chessPieces)){ 
-                std:: cout << "HELLO" << std::endl;
-                s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
-                s_piece.s_rect.y = s_piece.s_pos.x * tile_size;
-                for(auto i = 0; i < 32; i++){
-                    if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
-                        printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
-                        destRects[i].x = s_piece.s_rect.x;
-                        destRects[i].y = s_piece.s_rect.y;
-                        index = i;
-                        // printf("i = %d; (%d,%d)", i, pieces[i].dr.x, pieces[i].dr.y);
-                        // s_piece.s_pos.x = moveFromTo.x;
-                        // s_piece.s_pos.y = moveFromTo.y;
-                        // printf("piece pos: (%d,%d)", pieces[i].cp->position);
-                        break;
-                    }
-                }
-            }
-        }        
+        //         destRects[index].x = s_piece.s_rect.x; // destRects[index].x = pieces[index].cp->position.y * tile_size;
+        //         destRects[index].y = s_piece.s_rect.y; // destRects[index].y = pieces[index].cp->position.x * tile_size;
+        //         // for(auto i = 0; i < 32; i++){
+        //         //     if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
+        //         //         printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
+        //         //         destRects[i].x = s_piece.s_rect.x;
+        //         //         destRects[i].y = s_piece.s_rect.y;
+        //         //         index = i;
+        //         //         // printf("i = %d; (%d,%d)", i, pieces[i].dr.x, pieces[i].dr.y);
+        //         //         // s_piece.s_pos.x = moveFromTo.x;
+        //         //         // s_piece.s_pos.y = moveFromTo.y;
+        //         //         // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+        //         //         break;
+        //         //     }
+        //         // }
+        //     }
+        //     else{
+        //         destRects[index].x = originalValues.y * tile_size;
+        //         destRects[index].y = originalValues.x * tile_size;
+        //         s_piece.s_rect.x = originalValues.y * tile_size;
+        //         s_piece.s_rect.y = originalValues.x * tile_size;
+        //     }
+        //     // printf("s_piece rect = (%f,%f,%f,%f)\n", s_piece.s_rect.y, s_piece.s_rect.x, s_piece.s_rect.width, s_piece.s_rect.height);
+        //     // for(auto i : destRects){
+        //     //     printf("pieces dr = (%f,%f,%f,%f)\n", i.y, i.x, i.width, i.height);
+        //     // }
+        //     if((s_piece.s_pos.x != originalValues.x || s_piece.s_pos.y != originalValues.y)){ // && !king.isValidMove(&moveFromTo,c.chessPieces)){ 
+        //         std:: cout << "HELLO" << std::endl;
+        //         s_piece.s_rect.x = s_piece.s_pos.y * tile_size;
+        //         s_piece.s_rect.y = s_piece.s_pos.x * tile_size;
+        //         for(auto i = 0; i < 32; i++){
+        //             if(pieces[i].cp->position.x == moveFromTo.x && pieces[i].cp->position.y == moveFromTo.y){
+        //                 printf("i = %d; (%f,%f)", i, pieces[i].dr.x, pieces[i].dr.y);
+        //                 destRects[i].x = s_piece.s_rect.x;
+        //                 destRects[i].y = s_piece.s_rect.y;
+        //                 index = i;
+        //                 // printf("i = %d; (%d,%d)", i, pieces[i].dr.x, pieces[i].dr.y);
+        //                 // s_piece.s_pos.x = moveFromTo.x;
+        //                 // s_piece.s_pos.y = moveFromTo.y;
+        //                 // printf("piece pos: (%d,%d)", pieces[i].cp->position);
+        //                 // break;
+        //             }
+        //         }
+        //     }
+        // }        
 
         //RenderChessPieces(sourceRect, destRect, image);
 
@@ -507,13 +574,23 @@ int main()
             }
         }
 
+        // Update position if dragging
+        if (isDragging)
+        {
+            destRects[0].x = mousePosition.x - offset.x;
+            destRects[0].y = mousePosition.y - offset.y;
+            king.position.x = originalValues.x;
+            king.position.y = originalValues.y;
+            moveFromTo = Position(mousePosition.y/tile_size, mousePosition.x/tile_size);
+        } 
+
         // Check if left mouse button is released
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
         {
             isDragging = false;
             printf("Dest[0]:(%d,%d)\n",(int)(mousePosition.y/tile_size),(int)(mousePosition.x/tile_size));
             printf("King's Position : (%d, %d)\n", king.position.x, king.position.y);
-            king.MoveToPosition(&moveFromTo, c.chessPieces);
+            king.MoveToPosition(&moveFromTo);
             if((king.position.x != originalValues.x || king.position.y != originalValues.y)){ // && !king.isValidMove(&moveFromTo,c.chessPieces)){ 
                 //printf("isValidMove : %d\n", king.isValidMove(&moveFromTo,c.chessPieces));
                 destRects[0].x = king.position.y * tile_size;
@@ -525,21 +602,56 @@ int main()
             }
         }        
 
-        // Update position if dragging
-        if (isDragging)
-        {
-            destRects[0].x = mousePosition.x - offset.x;
-            destRects[0].y = mousePosition.y - offset.y;
-            king.position.x = originalValues.x;
-            king.position.y = originalValues.y;
-            moveFromTo = Position(mousePosition.y/tile_size, mousePosition.x/tile_size);
-        } 
-
         */
+
+
+        // Vector2 mousePosition = GetMousePosition();
+        // Position originalValues = Position(selectedPiece.position.x, selectedPiece.position.y); 
+
+        // // Check if mouse is inside the image
+        // if (CheckCollisionPointRec(mousePosition, destRects[0]))
+        // {
+        //     // Check if left mouse button is pressed
+        //     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        //     {
+        //         isDragging = true;
+        //         offset.x = mousePosition.x - destRects[0].x;
+        //         offset.y = mousePosition.y - destRects[0].y;
+        //     }
+        // }
+
+        // // Update position if dragging
+        // if (isDragging)
+        // {
+        //     destRects[0].x = mousePosition.x - offset.x;
+        //     destRects[0].y = mousePosition.y - offset.y;
+        //     selectedPiece.position.x = originalValues.x;
+        //     selectedPiece.position.y = originalValues.y;
+        //     moveFromTo = Position(mousePosition.y/tile_size, mousePosition.x/tile_size);
+        // } 
+
+        // // Check if left mouse button is released
+        // if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+        // {
+        //     isDragging = false;
+        //     printf("Dest[index]:(%d,%d)\n",(int)(mousePosition.y/tile_size),(int)(mousePosition.x/tile_size));
+        //     printf("Selected Piece's Position : (%d, %d)\n", selectedPiece.position.x, selectedPiece.position.y);
+        //     selectedPiece.MoveToPosition(&moveFromTo);
+        //     if((selectedPiece.position.x != originalValues.x || selectedPiece.position.y != originalValues.y)){ // && !king.isValidMove(&moveFromTo,c.chessPieces)){ 
+        //         //printf("isValidMove : %d\n", king.isValidMove(&moveFromTo,c.chessPieces));
+        //         destRects[index].x = king.position.y * tile_size;
+        //         destRects[index].y = king.position.x * tile_size;
+        //     }
+        //     else{
+        //         destRects[index].x = originalValues.y * tile_size;
+        //         destRects[index].y = originalValues.x * tile_size;
+        //     }
+        // }       
 
         // printf("King's Current Position: %f, %f\n", king.position.x, king.position.y);
         // printf("King rect = (%f,%f,%f,%f)\n", destRects[0].y, destRects[0].x, destRects[0].width, destRects[0].height);
         // printf("King's Current Position: %d, %d\n", king.position.x, king.position.y);
+
 
         DrawTexturePro(imageK, sourceRectKing, destRects[0], Vector2{ -10, -10 }, 0, WHITE);
         DrawTexturePro(imageQ, sourceRectQueen, destRects[1], Vector2{ -10, -10 }, 0, WHITE);

@@ -26,7 +26,7 @@ class Position{
 
 class ChessPiece{
     protected:
-        virtual bool isValidMove(Position * position, char chessPieces [ROWS][COLUMNS][4]) = 0;
+        bool selected = false;
     public:
         Image pieceImage;
         int pieceID;
@@ -38,7 +38,56 @@ class ChessPiece{
 
         }
 
-        virtual void MoveToPosition(Position * position, char chessPieces [ROWS][COLUMNS][4]) = 0;
+        bool isSelected() const {
+            return selected;
+        }
+
+        void setSelected(bool value) {
+            selected = value;
+        }
+
+        void setPosition(int x, int y) {
+            this->position.x = x;
+            this->position.y = y;
+        }
+
+        virtual bool isValidMove(Position * position) = 0; //{
+            // // std :: cout << "entered" << std :: endl;
+            // // return validityCheck(position);
+            // switch (this->type)
+            // {
+            //     case KING:
+            //         std :: cout << "works" << std :: endl;
+            //         return kingCheck(position);
+            //     case QUEEN:
+            //         std :: cout << "works" << std :: endl;
+            //         return queenCheck(position);
+            //     case ROOK:
+            //         std :: cout << "works" << std :: endl;
+            //         return rookCheck(position);
+            //     case KNIGHT:
+            //         std :: cout << "works" << std :: endl;
+            //         return knightCheck(position);
+            //     case BISHOP:
+            //         std :: cout << "works" << std :: endl;
+            //         return bishopCheck(position);
+            //     case PAWN:
+            //         std :: cout << "works" << std :: endl;
+            //         return pawnCheck(position);
+        //     }
+        // }
+
+        void MoveToPosition(Position * position){
+            printf("Current Position: %d, %d\n", (this->position).x, (this->position).y);
+            printf("Target Position: %d, %d\n", position->x, position->y);
+            setPosition(position->x, position->y);
+            // if(isValidMove(position)){
+            //     setPosition(position->x, position->y);
+            // }
+            // else printf("Invalid Move\n");
+        }
+
+
         std::string getType(){
             switch (this->type)
             {
@@ -57,7 +106,7 @@ class ChessPiece{
             }
         } 
 
-        bool kingCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool kingCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
@@ -73,24 +122,16 @@ class ChessPiece{
                     Position(x+1, y),
                     Position(x+1, y+1)
             };
-            printf("Color of surrounding piece : %c\n", chessPieces[position->x][position->y][2]);
+            
             for (int i = 0; i < sizeof(surroundingPositions) / sizeof(Position); i++) {
                 if (position->x == surroundingPositions[i].x && position->y == surroundingPositions[i].y){
-                    if((isWhite && chessPieces[position->x][position->y][2] == 'B') ||
-                        (!isWhite && chessPieces[position->x][position->y][2] == 'W'))
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
         }
 
-        bool queenCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool queenCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
@@ -152,27 +193,27 @@ class ChessPiece{
             return false;
         }
 
-        bool pawnCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool pawnCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
                 return false;
             }
             if(isWhite){
-                if((this->position.x + 1 == position->x) || (this->position.x == 1 && position->x == 4)){
+                if((this->position.x + 1 == position->x) || (this->position.x == 1 && position->x == 3) && (this->position.y == position->y)){
                     return true;
                 }
                 else return false;
             }
             else{
-                if((this->position.x - 1 == position->x) || (this->position.x == 6 && position->x == 4)){
+                if((this->position.x - 1 == position->x) || (this->position.x == 6 && position->x == 4) && (this->position.y == position->y)){
                     return true;
                 }
                 else return false;
             }
         }
         
-        bool rookCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool rookCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
@@ -198,7 +239,7 @@ class ChessPiece{
             return false;
         }
         
-        bool knightCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool knightCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
@@ -225,7 +266,7 @@ class ChessPiece{
             return false;
         }
         
-        bool bishopCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool bishopCheck(Position * position){
             int x = (this->position).x;
             int y = (this->position).y;
             if( 0 > x || x > 8 || 0 > y || y > 8){
@@ -280,21 +321,21 @@ class ChessPiece{
             return false;
         }
 
-        bool validityCheck(Position * position,char chessPieces [ROWS][COLUMNS][4]){
+        bool validityCheck(Position * position){
             switch (this->type)
             {
                 case KING:
-                    return kingCheck(position, chessPieces);
+                    return kingCheck(position);
                 case QUEEN:
-                    return queenCheck(position, chessPieces);
+                    return queenCheck(position);
                 case ROOK:
-                    return rookCheck(position, chessPieces);
+                    return rookCheck(position);
                 case KNIGHT:
-                    return knightCheck(position, chessPieces);
+                    return knightCheck(position);
                 case BISHOP:
-                    return bishopCheck(position, chessPieces);
+                    return bishopCheck(position);
                 case PAWN:
-                    return pawnCheck(position, chessPieces);
+                    return pawnCheck(position);
             }
         }
 };
@@ -302,10 +343,12 @@ class ChessPiece{
 /*
 ---------------------------------
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 
+---------------------------------
 | 9 | 10| 11| 12| 13| 14| 15| 16|
 ---------------------------------
 ---------------------------------
 | 17| 18| 19| 20| 21| 22| 23| 24| 
+---------------------------------
 | 25| 26| 27| 28| 29| 30| 31| 32|
 ---------------------------------
 */
