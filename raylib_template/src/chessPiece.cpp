@@ -34,6 +34,7 @@ class ChessPiece{
         Position position;
         PieceType type;
         bool isWhite;
+        bool isCaptured = false;
         ChessPiece(){
 
         }

@@ -221,7 +221,17 @@ bool CheckSameColor(std::vector<c_pieces> pieces, ChessPiece * selectedPiece, Po
     return IsSameColor;
 }
 
-void checkMoveValidityForSelectedPiece(std::vector<c_pieces> pieces, Position dest) {
+int SetCapturedIndices(std::vector<c_pieces> pieces, Position dest){
+    int cap_index = -1;
+    for (int i = 0; i < pieces.size(); ++i) {
+        if(i != index && (pieces[i].cp->position.x == dest.x && pieces[i].cp->position.y == dest.y)){
+            cap_index = i;
+        }
+    }
+    return cap_index;
+}
+
+void CheckMoveValidityForSelectedPiece(std::vector<c_pieces>& pieces, Position dest) {
     if (selectedPiece) {
         printf("Is Valid: %d\n", selectedPiece->validityCheck(&dest));
         // Call the specific move validity check for the selected piece
@@ -230,6 +240,11 @@ void checkMoveValidityForSelectedPiece(std::vector<c_pieces> pieces, Position de
             selectedPiece->MoveToPosition(&dest);
             pieces[index].dr->x = selectedPiece->position.y * tile_size;
             pieces[index].dr->y = selectedPiece->position.x * tile_size;
+
+            int captured_index = SetCapturedIndices(pieces,dest);
+            if(captured_index != -1){
+                pieces[captured_index].cp->isCaptured = true;
+            }
         } else {
             std::cout << "INVALID MOVE: " + selectedPiece->getType() << std::endl;
             // Handle the invalid move appropriately (e.g., show an error message)
@@ -243,144 +258,149 @@ void checkMoveValidityForSelectedPiece(std::vector<c_pieces> pieces, Position de
     }
 }
 
-void handleChessPieceSelection(std::vector<c_pieces>  pieces, Vector2 offset) {
+void HandleChessPieceSelection(std::vector<c_pieces>& pieces, Vector2 offset) {
     Vector2 mousePosition = GetMousePosition();
-    
     // Deselect all pieces first
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < pieces.size(); ++i) {
         pieces[i].cp->setSelected(false);
     }
 
     // Check for mouse click on any piece and select it
-    for (int i = 0; i < 32; ++i) {
-        bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, *pieces[i].dr);
+    for (int i = 0; i < pieces.size(); ++i) {
+        if(!pieces[i].cp->isCaptured){
+            bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, *pieces[i].dr);
 
-        if (isMouseClickedOnImage) {
-            // Check if left mouse button is pressed
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                std :: cout << pieces[i].cp -> getType() << std:: endl;
-                pieces[i].cp->setSelected(true);
-                selectedPiece = pieces[i].cp;
-                index = i;
-                offset.x = mousePosition.x - pieces[i].dr->x;
-                offset.y = mousePosition.y - pieces[i].dr->y;
-                printf("Index i : %d \n",index);
-                printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
-                printf("Offset : (%f, %f)\n", offset.x, offset.y);
-                break; // Break the loop after selecting one piece
+            if (isMouseClickedOnImage) {
+                // Check if left mouse button is pressed
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    std :: cout << pieces[i].cp -> getType() << std:: endl;
+                    pieces[i].cp->setSelected(true);
+                    selectedPiece = pieces[i].cp;
+                    index = i;
+                    offset.x = mousePosition.x - pieces[i].dr->x;
+                    offset.y = mousePosition.y - pieces[i].dr->y;
+                    printf("Index i : %d \n",index);
+                    printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
+                    printf("Offset : (%f, %f)\n", offset.x, offset.y);
+                    break; // Break the loop after selecting one piece
+                }
             }
         }
     }
 
     // Update position if dragging
-    if (selectedPiece && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-        selectedPiece->setSelected(true);
-        pieces[index].dr->x = mousePosition.x - offset.x;
-        pieces[index].dr->y = mousePosition.y - offset.y;
-        printf("Pieces Rectangle (%f,%f)\n", pieces[index].dr->y, pieces[index].dr->x);
-    } 
-    else if (selectedPiece && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-        checkMoveValidityForSelectedPiece(pieces, Position(mousePosition.y / tile_size, mousePosition.x / tile_size));
+    if(selectedPiece){
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            selectedPiece->setSelected(true);
+            pieces[index].dr->x = mousePosition.x - offset.x;
+            pieces[index].dr->y = mousePosition.y - offset.y;
+            printf("Pieces Rectangle (%f,%f)\n", pieces[index].dr->y, pieces[index].dr->x);
+        }
+        else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+            CheckMoveValidityForSelectedPiece(pieces, Position(mousePosition.y / tile_size, mousePosition.x / tile_size));
+        }
     }
 }
 
-void RenderChessPieceImage(std::vector<c_pieces> pieces){
-    for (int i = 0; i < pieces.size(); ++i) {
-        switch (pieces[i].cp->type)
-        {
-            case KING:
+void RenderChessPieceImage(const std::vector<c_pieces>& pieces){
+    for (int i = 0; i < pieces.size(); i++) {
+        if(pieces[i].cp->isCaptured == false){
+            switch (pieces[i].cp->type)
             {
-                if(pieces[i].cp->isWhite){
-                    DrawTexturePro(imageK, sourceRectKing, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                }
-                else{
-                    DrawTexturePro(imageK2, sourceRectKing, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                }
-            }break;
+                case KING:
+                {
+                    if(pieces[i].cp->isWhite){
+                        DrawTexturePro(imageK, sourceRectKing, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                    }
+                    else{
+                        DrawTexturePro(imageK2, sourceRectKing, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                    }
+                }break;
 
-            case QUEEN:
-            {
-                if(pieces[i].cp->isWhite){
-                    DrawTexturePro(imageQ, sourceRectQueen, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                }
-                else{
-                    DrawTexturePro(imageQ2, sourceRectQueen, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                }
-            }break;
+                case QUEEN:
+                {
+                    if(pieces[i].cp->isWhite){
+                        DrawTexturePro(imageQ, sourceRectQueen, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                    }
+                    else{
+                        DrawTexturePro(imageQ2, sourceRectQueen, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                    }
+                }break;
 
-            case ROOK:
-            {
-                if(pieces[i].cp->isWhite){
-                    if(i == 2){
-                        DrawTexturePro(imageR1, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                case ROOK:
+                {
+                    if(pieces[i].cp->isWhite){
+                        if(i == 2){
+                            DrawTexturePro(imageR1, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                        }
+                        else if (i == 3){
+                            DrawTexturePro(imageR2, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                        }
                     }
-                    else if (i == 3){
-                        DrawTexturePro(imageR2, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                    else {
+                        if(i == 18){
+                            DrawTexturePro(image_r1, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                        }
+                        else if (i == 19){
+                            DrawTexturePro(image_r2, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
+                        }
                     }
-                }
-                else {
-                    if(i == 18){
-                        DrawTexturePro(image_r1, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
-                    }
-                    else if (i == 19){
-                        DrawTexturePro(image_r2, sourceRectRook, *(pieces[i].dr), Vector2{-20, -20}, 0, WHITE);
-                    }
-                }
-            }break;
+                }break;
 
-            case KNIGHT:
-            {
-                if(pieces[i].cp->isWhite){
-                    if(i == 4){
-                        DrawTexturePro(imageKn1, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                case KNIGHT:
+                {
+                    if(pieces[i].cp->isWhite){
+                        if(i == 4){
+                            DrawTexturePro(imageKn1, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                        }
+                        else if (i == 5){
+                            DrawTexturePro(imageKn2, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                        }
                     }
-                    else if (i == 5){
-                        DrawTexturePro(imageKn2, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                    else {
+                        if(i == 20){
+                            DrawTexturePro(image_kn1, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                        }
+                        else if (i == 21){
+                            DrawTexturePro(image_kn2, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
+                        }
                     }
-                }
-                else {
-                    if(i == 20){
-                        DrawTexturePro(image_kn1, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
-                    }
-                    else if (i == 21){
-                        DrawTexturePro(image_kn2, sourceRectKnight, *(pieces[i].dr), Vector2{-15, -20}, 0, WHITE);
-                    }
-                }
-            }break;
+                }break;
 
-            case BISHOP:
-            {
-                if(pieces[i].cp->isWhite){
-                    if(i == 6){
-                        DrawTexturePro(imageB1, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                case BISHOP:
+                {
+                    if(pieces[i].cp->isWhite){
+                        if(i == 6){
+                            DrawTexturePro(imageB1, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                        }
+                        else if (i == 7){
+                            DrawTexturePro(imageB2, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                        }
                     }
-                    else if (i == 7){
-                        DrawTexturePro(imageB2, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                    else {
+                        if(i == 22){
+                            DrawTexturePro(image_b1, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                        }
+                        else if (i == 23){
+                            DrawTexturePro(image_b2, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
+                        }
                     }
-                }
-                else {
-                    if(i == 22){
-                        DrawTexturePro(image_b1, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                    }
-                    else if (i == 23){
-                        DrawTexturePro(image_b2, sourceRectBishop, *(pieces[i].dr), Vector2{-10, -10}, 0, WHITE);
-                    }
-                }
-            }break;
+                }break;
 
-            case PAWN:
-            {
-                if(pieces[i].cp->isWhite){
-                    if(i > 7 && i < 17) {
-                        DrawTexturePro(imageP, sourceRectPawn, *(pieces[i].dr), Vector2{-25, -20}, 0, WHITE);
+                case PAWN:
+                {
+                    if(pieces[i].cp->isWhite){
+                        if(i > 7 && i < 17) {
+                            DrawTexturePro(imageP, sourceRectPawn, *(pieces[i].dr), Vector2{-25, -20}, 0, WHITE);
+                        }
                     }
-                }
-                else {
-                    if(i > 23 && i < 32) {
-                        DrawTexturePro(image_p, sourceRectPawn, *(pieces[i].dr), Vector2{-25, -20}, 0, WHITE);
+                    else {
+                        if(i > 23 && i < 32) {
+                            DrawTexturePro(image_p, sourceRectPawn, *(pieces[i].dr), Vector2{-25, -20}, 0, WHITE);
+                        }
                     }
-                }
-            }break;
+                }break;
+            }
         }
     }
 }
@@ -654,8 +674,7 @@ int main()
         
         RenderChessBoard();
 
-        handleChessPieceSelection(pieces, offset);
-
+        HandleChessPieceSelection(pieces, offset);
         /*
         DrawTexturePro(imageK, sourceRectKing, destRects[0], Vector2{ -10, -10 }, 0, WHITE);
         DrawTexturePro(imageQ, sourceRectQueen, destRects[1], Vector2{ -10, -10 }, 0, WHITE);
