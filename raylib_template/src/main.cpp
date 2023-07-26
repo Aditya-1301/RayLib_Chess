@@ -5,28 +5,15 @@
 
 void boardColorsSet(std::vector<std::vector<Color>>& boardColors);
 void RenderChessBoard();
-bool getClickWithChessPieces(ChessPiece * chessPiece, ChessBoard chessBoard, Rectangle destRect);
-void RenderChessPieces(ChessBoard chessBoard, Rectangle sourceRect, Rectangle destRect, Position position, Texture2D image);
-bool getClickOnTile(Position * position, Rectangle * tile);
+void RenderChessPieceImage(const std::vector<c_pieces>& pieces);
 
-struct piece{
+typedef struct piece{
         ChessPiece * cp;
         Rectangle * dr;
-    };
-
-typedef struct piece c_pieces;
-
-struct Selected{
-    Position s_pos;
-    Rectangle s_rect;
-};
-typedef struct Selected selected;
-
-selected s_piece;
+} c_pieces;
 
 ChessPiece * selectedPiece = nullptr;
 int index;
-Position moveFromTo;
 
 Texture2D imageR1;
 Texture2D imageR2;
@@ -108,40 +95,6 @@ void RenderChessBoard(){
             DrawRectangle(i*tile_size, j*tile_size, tile_size, tile_size, boardColors[i][j]); 
         }
     }
-}
-
-bool getClickWithChessPieces(ChessPiece * chessPiece, ChessBoard chessBoard, Rectangle destRect){
-    Vector2 mousePosition = GetMousePosition();
-    Rectangle imageBounds = { destRect.x, destRect.y, destRect.width, destRect.height };
-    bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, imageBounds) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-    if (isMouseClickedOnImage)
-    {
-        std :: cout << chessPiece -> getType() << std:: endl;
-        s_piece = {Position(chessPiece->position.x, chessPiece->position.y), destRect};
-        printf("s_piece : (%f, %f) ; (%f, %f, %f, %f)", s_piece.s_pos.x, s_piece.s_pos, s_piece.s_rect.x, s_piece.s_rect.y, s_piece.s_rect.width, s_piece.s_rect.height);
-        return true;
-    }
-    return false;
-}
-
-bool getClickOnTile(ChessBoard c){
-    Vector2 mousePosition = GetMousePosition();
-    Rectangle imageBounds;
-    for (auto i = 0; i < ROWS; i++)
-    {
-        for (auto j = 0; j < COLUMNS; j++)
-        {
-            imageBounds = c.tiles[i][j];
-            bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, imageBounds) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-            if (isMouseClickedOnImage)
-            {
-                printf("Clicked on the chessboard tile!\n");
-                moveFromTo = Position(mousePosition.y/tile_size, mousePosition.x/tile_size);
-                return true;
-            }
-        }
-    }
-    return false;
 }
 
 void InitTextures() {
