@@ -3,10 +3,6 @@
 #define W_WIDTH 800 //500
 #define W_HEIGHT 800 //500
 
-void boardColorsSet(std::vector<std::vector<Color>>& boardColors);
-void RenderChessBoard();
-void RenderChessPieceImage(const std::vector<c_pieces>& pieces);
-
 typedef struct piece{
         ChessPiece * cp;
         Rectangle * dr;
@@ -14,6 +10,7 @@ typedef struct piece{
 
 ChessPiece * selectedPiece = nullptr;
 int index;
+int turnCount = 0;
 
 Texture2D imageR1;
 Texture2D imageR2;
@@ -56,6 +53,11 @@ Rectangle sourceRectBishop;
 Rectangle sourceRectKnight;
 Rectangle sourceRectPawn;
 
+void boardColorsSet(std::vector<std::vector<Color>>& boardColors);
+void RenderChessBoard();
+void RenderChessPieceImage(const std::vector<c_pieces>& pieces);
+
+
 void boardColorsSet(std::vector<std::vector<Color>>& boardColors){
     Vector2 mousePos = GetMousePosition();
     int tileX = static_cast<int>(mousePos.x / tile_size);
@@ -76,7 +78,11 @@ void boardColorsSet(std::vector<std::vector<Color>>& boardColors){
                         boardColors[i][j] = BLUE;
                     }
                     else{
-                        boardColors[i][j] = BLACK;
+                        if(turnCount % 2 == 0){
+                            boardColors[i][j] = WHITE;
+                        }else{
+                            boardColors[i][j] = BLACK;
+                        }
                     }
                 }
             }
@@ -193,6 +199,7 @@ void CheckMoveValidityForSelectedPiece(std::vector<c_pieces>& pieces, Position d
             selectedPiece->MoveToPosition(&dest);
             pieces[index].dr->x = selectedPiece->position.y * tile_size;
             pieces[index].dr->y = selectedPiece->position.x * tile_size;
+            turnCount++;
 
             int captured_index = SetCapturedIndices(pieces,dest);
             if(captured_index != -1){
@@ -211,6 +218,24 @@ void CheckMoveValidityForSelectedPiece(std::vector<c_pieces>& pieces, Position d
     }
 }
 
+bool WhenButtonPressed(std::vector<c_pieces> pieces, int i, Vector2 offset, Vector2 mousePosition){
+    // Check if left mouse button is pressed
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+
+        std :: cout << pieces[i].cp -> getType() << std:: endl;
+        pieces[i].cp->setSelected(true);
+        selectedPiece = pieces[i].cp;
+        index = i;
+        offset.x = mousePosition.x - pieces[i].dr->x;
+        offset.y = mousePosition.y - pieces[i].dr->y;
+        printf("Index i : %d \n",index);
+        printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
+        printf("Offset : (%f, %f)\n", offset.x, offset.y);
+        return true;
+    }
+    return false;
+}
+
 void HandleChessPieceSelection(std::vector<c_pieces>& pieces, Vector2 offset) {
     Vector2 mousePosition = GetMousePosition();
     // Deselect all pieces first
@@ -222,20 +247,18 @@ void HandleChessPieceSelection(std::vector<c_pieces>& pieces, Vector2 offset) {
     for (int i = 0; i < pieces.size(); ++i) {
         if(!pieces[i].cp->isCaptured){
             bool isMouseClickedOnImage = CheckCollisionPointRec(mousePosition, *pieces[i].dr);
-
-            if (isMouseClickedOnImage) {
-                // Check if left mouse button is pressed
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    std :: cout << pieces[i].cp -> getType() << std:: endl;
-                    pieces[i].cp->setSelected(true);
-                    selectedPiece = pieces[i].cp;
-                    index = i;
-                    offset.x = mousePosition.x - pieces[i].dr->x;
-                    offset.y = mousePosition.y - pieces[i].dr->y;
-                    printf("Index i : %d \n",index);
-                    printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
-                    printf("Offset : (%f, %f)\n", offset.x, offset.y);
-                    break; // Break the loop after selecting one piece
+            if(turnCount % 2 == 0){
+                if(pieces[i].cp->isWhite && isMouseClickedOnImage){
+                    if(WhenButtonPressed(pieces,i,offset,mousePosition)){
+                        break;
+                    }
+                }
+            }
+            else{
+                if(!pieces[i].cp->isWhite && isMouseClickedOnImage){
+                    if(WhenButtonPressed(pieces,i,offset,mousePosition)){
+                        break;
+                    }
                 }
             }
         }
