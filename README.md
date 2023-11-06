@@ -11,10 +11,12 @@ To use this repository, you need to have Raylib installed. However, if you don't
 
 # Images
 
-Images to show how the game looks in different player positions. The color of the board indicates which player's turn it is:
+Here are images showing the game from different player perspectives. The board's color indicates the current player's turn:
 - Red-Black -> Black Piece Turn
 - Blue-White -> White Piece Turn
 
-<span><img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Red.png" width="500" height="500">
-<img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="500" height="500"></span>
+<span>
+  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Red.png" width="500" height="500">
+  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="500" height="500">
+</span>
 
