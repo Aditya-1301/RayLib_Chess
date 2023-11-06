@@ -16,7 +16,7 @@ Here are images showing the game from different player perspectives. The board's
 - Blue-White -> White Piece Turn
 
 <span>
-  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Red.png" width="500" height="500">
-  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="500" height="500">
+  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Red.png" width="300" height="300">
+  <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="300" height="300">
 </span>
 
