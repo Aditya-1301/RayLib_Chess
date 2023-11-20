@@ -9,7 +9,9 @@
 #include "pawn.h"
 #include <vector>
 #include <iostream>
+// #include "utilities.h"
 
+//*
 #define W_WIDTH 800 //500
 #define W_HEIGHT 800 //500
 
@@ -21,6 +23,7 @@ typedef struct piece{
 } c_pieces;
 
 ChessPiece * selectedPiece = nullptr;
+std :: vector<c_pieces> pieces;
 int index;
 int turnCount = 0;
 
@@ -273,24 +276,23 @@ void HandleChessPieceSelection(std::vector<c_pieces>& pieces, Vector2 offset) {
                     }
                 }
             }
-            /*
-            if (isMouseClickedOnImage) {
-                // Check if left mouse button is pressed
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    turnCount++;
-                    std :: cout << pieces[i].cp -> getType() << std:: endl;
-                    pieces[i].cp->setSelected(true);
-                    selectedPiece = pieces[i].cp;
-                    index = i;
-                    offset.x = mousePosition.x - pieces[i].dr->x;
-                    offset.y = mousePosition.y - pieces[i].dr->y;
-                    printf("Index i : %d \n",index);
-                    printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
-                    printf("Offset : (%f, %f)\n", offset.x, offset.y);
-                    break; // Break the loop after selecting one piece
-                }
-            }
-            */
+            
+            // if (isMouseClickedOnImage) {
+            //     // Check if left mouse button is pressed
+            //     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            //         turnCount++;
+            //         std :: cout << pieces[i].cp -> getType() << std:: endl;
+            //         pieces[i].cp->setSelected(true);
+            //         selectedPiece = pieces[i].cp;
+            //         index = i;
+            //         offset.x = mousePosition.x - pieces[i].dr->x;
+            //         offset.y = mousePosition.y - pieces[i].dr->y;
+            //         printf("Index i : %d \n",index);
+            //         printf("Selected Piece Type: %s \n",selectedPiece -> getType().c_str());
+            //         printf("Offset : (%f, %f)\n", offset.x, offset.y);
+            //         break; // Break the loop after selecting one piece
+            //     }
+            // }
         }
     }
 
@@ -410,6 +412,7 @@ void RenderChessPieceImage(const std::vector<c_pieces>& pieces){
         }
     }
 }
+// */
 
 
 int main() {
@@ -532,7 +535,7 @@ int main() {
             {static_cast<float>(pawn16.position.y) * tile_size, static_cast<float>(pawn16.position.x) * tile_size, static_cast<float>(pawnBImage.width) / 10, static_cast<float>(pawnBImage.height) / 10}
     };
 
-    std :: vector<c_pieces> pieces = {
+    pieces = {
             {&king, &destRects[0]},
             {&queen, &destRects[1]},
             {&rook1, &destRects[2]},
