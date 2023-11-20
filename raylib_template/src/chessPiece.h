@@ -13,8 +13,8 @@
 #define ROWS 8
 #define COLUMNS 8
 
-#ifndef CHESS_CPP_CHESSPIECE_H
-#define CHESS_CPP_CHESSPIECE_H
+#ifndef CHESS_CHESSPIECE_H
+#define CHESS_CHESSPIECE_H
 
 enum PieceType {
     KING,

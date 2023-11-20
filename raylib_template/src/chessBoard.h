@@ -4,8 +4,8 @@
 
 #pragma once
 
-#ifndef CHESS_CPP_CHESSBOARD_H
-#define CHESS_CPP_CHESSBOARD_H
+#ifndef CHESS_CHESSBOARD_H
+#define CHESS_CHESSBOARD_H
 
 #define ROWS 8
 #define COLUMNS 8
@@ -38,4 +38,4 @@ public:
     void printBoardState();
 };
 
-#endif //CHESS_CPP_CHESSBOARD_H
+#endif //CHESS_CHESSBOARD_H

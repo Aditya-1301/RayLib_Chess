@@ -4,8 +4,8 @@
 
 #pragma once
 
-#ifndef CHESS_CPP_PAWN_H
-#define CHESS_CPP_PAWN_H
+#ifndef CHESS_PAWN_H
+#define CHESS_PAWN_H
 
 #include "chessBoard.h"
 #include "chessPiece.h"

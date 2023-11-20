@@ -8,8 +8,8 @@
 #include "chessPiece.h"
 #include <cmath>
 
-#ifndef CHESS_CPP_KNIGHT_H
-#define CHESS_CPP_KNIGHT_H
+#ifndef CHESS_KNIGHT_H
+#define CHESS_KNIGHT_H
 
 
 class Knight : public ChessPiece{

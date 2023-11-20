@@ -4,8 +4,8 @@
 
 #pragma once
 
-#ifndef CHESS_CPP_ROOK_H
-#define CHESS_CPP_ROOK_H
+#ifndef CHESS_ROOK_H
+#define CHESS_ROOK_H
 
 #include <cmath>
 #include "chessBoard.h"

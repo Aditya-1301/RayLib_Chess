@@ -4,12 +4,12 @@
 
 #pragma once
 
+#ifndef CHESS_QUEEN_H
+#define CHESS_QUEEN_H
+
 #include <cmath>
 #include "chessBoard.h"
 #include "chessPiece.h"
-
-#ifndef CHESS_CPP_QUEEN_H
-#define CHESS_CPP_QUEEN_H
 
 class Queen : public ChessPiece {
 public:
