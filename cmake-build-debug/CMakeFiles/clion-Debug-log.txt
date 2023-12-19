@@ -1,13 +1,4 @@
 "E:\CLion 2022.1.3\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=E:/CLion 2022.1.3/bin/ninja/win/x64/ninja.exe" -G Ninja -S D:\RayLib\Chess -B D:\RayLib\Chess\cmake-build-debug
--- Configuring done (0.3s)
-CMake Error at CMakeLists.txt:9 (add_executable):
-  Cannot find source file:
-
-    raylib_template/src/headers.h
-
-
-CMake Error at CMakeLists.txt:9 (add_executable):
-  No SOURCES given to target: Chess
-
-
-CMake Generate step failed.  Build files cannot be regenerated correctly.
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: D:/RayLib/Chess/cmake-build-debug

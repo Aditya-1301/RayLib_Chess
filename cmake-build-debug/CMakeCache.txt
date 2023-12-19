@@ -251,6 +251,9 @@ Chess_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Chess_SOURCE_DIR:STATIC=D:/RayLib/Chess
 
+//Path to a library.
+RAYLIB_LIBRARY:FILEPATH=C:/msys64/mingw64/lib/libraylib.dll.a
+
 
 ########################
 # INTERNAL cache entries
