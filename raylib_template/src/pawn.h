@@ -4,18 +4,20 @@
 
 #pragma once
 
-#ifndef CHESS_PAWN_H
-#define CHESS_PAWN_H
+#ifndef CHESS_CPP_PAWN_H
+#define CHESS_CPP_PAWN_H
 
-#include "chessBoard.h"
-#include "chessPiece.h"
+#include "ChessBoard.h"
+#include "ChessPiece.h"
 #include <cmath>
+using namespace ChessPiece_N;
+
 
 class Pawn : public ChessPiece{
 public:
     Pawn(){}
     Pawn(Position position, bool isWhite, bool isPieceCaptured, ChessBoard &chessBoard){
-        this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\w_pawn_2x_ns.png") : LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\b_pawn_2x_ns.png");
+        this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess_CPP\\raylib_template\\src\\res\\w_pawn_2x_ns.png") : LoadImage("D:\\RayLib\\Chess_CPP\\raylib_template\\src\\res\\b_pawn_2x_ns.png");
         this->position = position;
         // position = (isWhite)? Position(1,0) : Position(6,7);
         this->isWhite = isWhite;

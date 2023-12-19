@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "chessBoard.h"
-#include "chessPiece.h"
-#include <cmath>
-
 #ifndef CHESS_CPP_BISHOP_H
 #define CHESS_CPP_BISHOP_H
+
+#include "ChessBoard.h"
+#include "ChessPiece.h"
+#include <cmath>
+using namespace ChessPiece_N;
 
 class Bishop : public ChessPiece{
 public:
@@ -32,6 +33,5 @@ public:
 
     bool isValidMove(Position * position) override;
 };
-
 
 #endif //CHESS_CPP_BISHOP_H

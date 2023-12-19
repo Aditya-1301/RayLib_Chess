@@ -4,18 +4,19 @@
 
 #pragma once
 
-#ifndef CHESS_ROOK_H
-#define CHESS_ROOK_H
+#ifndef CHESS_CPP_ROOK_H
+#define CHESS_CPP_ROOK_H
 
+#include "ChessBoard.h"
+#include "ChessPiece.h"
 #include <cmath>
-#include "chessBoard.h"
-#include "chessPiece.h"
+using namespace ChessPiece_N;
 
 class Rook : public ChessPiece{
 public:
     Rook(){}
     Rook(Position position, bool isWhite, bool isPieceCaptured, ChessBoard &chessBoard){
-        this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\w_rook_2x_ns.png") : LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\b_rook_2x_ns.png");
+        this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess_CPP\\raylib_template\\src\\res\\w_rook_2x_ns.png") : LoadImage("D:\\RayLib\\Chess_CPP\\raylib_template\\src\\res\\b_rook_2x_ns.png");
         this->position = position;
         this->isWhite = isWhite;
         this->isCaptured = isPieceCaptured;
