@@ -20,7 +20,7 @@ Here are images showing the game from different player perspectives. The board's
   <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="300" height="300">
 </span>
 
----
+# How to use:
 
 ### To compile:
 
