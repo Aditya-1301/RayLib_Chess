@@ -1,2 +1,2 @@
-To compile : root folder> g++ src/main.cpp -I include -L lib -lraylib -lopengl32 -lgdi32 -lwinmm
+To compile : root folder> g++ src/main.cpp src/rook.cpp src/king.cpp src/pawn.cpp src/chessBoard.cpp src/chessPiece.cpp src/queen.cpp src/knight.cpp src/bishop.cpp src/utilities.cpp -I include -L lib -lraylib -lopengl32 -lgdi32 -lwinmm -O1 -Wall -Wextra
 To run : Then just double click on the a.exe file through file explorer and you're done.

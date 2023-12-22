@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Chess::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Chess-Debug-ec565f7ccabe6f8a6cb1.json",
+					"jsonFile" : "target-Chess-Debug-8ff4810fb5eac4097180.json",
 					"name" : "Chess",
 					"projectIndex" : 0
 				}
@@ -55,6 +55,6 @@
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 3
+		"minor" : 6
 	}
 }

@@ -1,47 +1,32 @@
-#include "headers.h"
+//
+// Created by agupt on 14/07/2023.
+//
+
+#include "rook.h"
 #include <vector>
 
-class Rook : public ChessPiece{
-    public:
-        Rook(Position position, bool isWhite, ChessBoard &chessBoard){
-            this->pieceImage = (isWhite) ? LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\w_rook_2x_ns.png") : LoadImage("D:\\RayLib\\Chess\\raylib_template\\src\\res\\b_rook_2x_ns.png");
-            this->position = position;
-            this->isWhite = isWhite;
-            this->type = PieceType::ROOK;
-            if((this->position).y == 0){
-                this->pieceID = (isWhite)? 1 : 25;
+bool Rook ::isValidMove(Position *position) {
+    int x = (this->position).x;
+    int y = (this->position).y;
+    if( 0 > x || x > 8 || 0 > y || y > 8){
+        return false;
+    }
+    std::vector<Position> possiblePositions;
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            if(i == (this->position).x || j == (this->position).y){
+                possiblePositions.push_back(Position(i,j));
             }
-            else if((this->position).y == 7){
-                this->pieceID = (isWhite)? 8 : 32;
-            }
-            chessBoard.pieceIDs[this->position.x][this->position.y] = this->pieceID;
-            this->pieceRectangle = { (float)(this->position).y*tile_size, (float)(this->position).x*tile_size, (float)((this->pieceImage).width / 10), (float)((this->pieceImage).height / 10 )};
-            sprintf(chessBoard.chessPieces[position.x][position.y], "R_%c", (isWhite) ? 'W' : 'B');
         }
-
-        bool isValidMove(Position * position) override{
-            int x = (this->position).x;
-            int y = (this->position).y;
-            if( 0 > x || x > 8 || 0 > y || y > 8){
-                return false;
-            }
-            std::vector<Position> possiblePositions;
-            for (int i = 0; i < ROWS; i++) {
-                for (int j = 0; j < COLUMNS; j++) {
-                    if(i == (this->position).x || j == (this->position).y){
-                        possiblePositions.push_back(Position(i,j));
-                    }
-                }
-            }       
-            for (auto possiblePosition : possiblePositions) {
-                printf("(%d, %d), ", possiblePosition.x, possiblePosition.y);
-            }
-            printf("\n");
-            for (auto possiblePosition: possiblePositions) {
-                if(possiblePosition.x == position->x && possiblePosition.y == position->y){
-                    return true;
-                }
-            }
-            return false;
-        } 
-};
+    }
+    for (auto possiblePosition : possiblePositions) {
+        printf("(%d, %d), ", possiblePosition.x, possiblePosition.y);
+    }
+    printf("\n");
+    for (auto possiblePosition: possiblePositions) {
+        if(possiblePosition.x == position->x && possiblePosition.y == position->y){
+            return true;
+        }
+    }
+    return false;
+}

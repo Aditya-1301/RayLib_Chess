@@ -20,3 +20,14 @@ Here are images showing the game from different player perspectives. The board's
   <img src="https://github.com/Aditya-1301/RayLib_Chess/blob/main/images/Chess_Blue.png" width="300" height="300">
 </span>
 
+---
+
+### To compile:
+
+`root folder> g++ src/main.cpp src/rook.cpp src/king.cpp src/pawn.cpp src/chessBoard.cpp src/chessPiece.cpp src/queen.cpp src/knight.cpp src/bishop.cpp src/utilities.cpp -I include -L lib -lraylib -lopengl32 -lgdi32 -lwinmm -O1 -Wall -Wextra`
+
+### To run:
+
+- CMD: `a.exe`
+- PowerShell: `./a.exe`
+- Unix-based Terminals: `./a`
