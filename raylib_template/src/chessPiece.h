@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include "raylib.h"
 #include "ChessBoard.h"
 #include <stdio.h>
@@ -45,13 +46,16 @@ namespace ChessPiece_N{
     protected:
         bool selected = false;
     public:
-        Image pieceImage;
-        Rectangle pieceRectangle;
         Position position;
         PieceType type;
         bool isWhite;
-        bool isCaptured = false;
-        ChessPiece(){}
+        bool isCaptured;
+        int moveCount;
+
+        ChessPiece(){
+            isCaptured = false;
+            moveCount = 0;
+        }
 
         bool isSelected() const {
             return selected;
@@ -72,7 +76,10 @@ namespace ChessPiece_N{
             printf("Current Position: %d, %d\n", (this->position).x, (this->position).y);
             printf("Target Position: %d, %d\n", position->x, position->y);
             setPosition(position->x, position->y);
+            this->moveCount++;
         }
+
+        std::vector<Position> allPossiblePositionsForCurrentPiece();
 
         std::string getType();
 
@@ -105,6 +112,16 @@ namespace ChessPiece_N{
                     return pawnCheck(position);
                 default: return false;
             }
+        }
+
+        bool hasMovedTwoSpacesOnItsFirstMove(){
+            if(this->type == PAWN && moveCount == 1){
+                if( (this->isWhite && this->position.y == 4) || (!this->isWhite && this->position.y == 3)){
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     };
 }
