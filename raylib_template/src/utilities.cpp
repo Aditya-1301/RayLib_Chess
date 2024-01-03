@@ -9,6 +9,7 @@ namespace Utilities_N{
 
     ChessPiece* selectedPiece = nullptr;
     std::vector<c_pieces> pieces;
+    std::vector<std::vector<Color>> originalBoardColors(8, std::vector<Color>(8, WHITE));
     int index;
     int turnCount = 0;
 
@@ -43,20 +44,86 @@ namespace Utilities_N{
                             }
                         }
                     }
+                    originalBoardColors[i][j] = boardColors[i][j];
                 }
             }
         }
     }
 
+    Color ColorOverlay(const Color& base, const Color& overlay, float factor) {
+        return {
+                static_cast<unsigned char>(base.r + (overlay.r - base.r) * factor),
+                static_cast<unsigned char>(base.g + (overlay.g - base.g) * factor),
+                static_cast<unsigned char>(base.b + (overlay.b - base.b) * factor),
+                static_cast<unsigned char>(base.a + (overlay.a - base.a) * factor)
+        };
+    }
+
+    void highlightPossiblePositionsForCurrentPiece(std::vector<std::vector<Color>>& boardColors) {
+        if (selectedPiece) {
+            std::vector<Position> possiblePositions = selectedPiece->allPossiblePositionsForCurrentPiece();
+
+            for (auto pos : possiblePositions) {
+                // Check if the position is within the chessboard bounds
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    // Highlight the possible position if the tile is empty
+                    if (boardColors[pos.x][pos.y].r != GRAY.r ||
+                        boardColors[pos.x][pos.y].g != GRAY.g ||
+                        boardColors[pos.x][pos.y].b != GRAY.b ||
+                        boardColors[pos.x][pos.y].a != GRAY.a) {
+                        if(selectedPiece->isWhite){
+                            boardColors[pos.y][pos.x] = Fade(GREEN, 0.5f);
+                        }
+                        else{
+                            boardColors[pos.y][pos.x] = Fade(ORANGE, 0.5f);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+/*
+    void highlightPossiblePositionsForCurrentPiece(std::vector<std::vector<Color>>& boardColors) {
+        if (selectedPiece) {
+            std::vector<Position> possiblePositions = selectedPiece->allPossiblePositionsForCurrentPiece();
+
+            for (auto pos : possiblePositions) {
+                if (pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8) {
+                    // Highlight the possible position if the tile is empty or has a different color
+                    const Color& currentColor = boardColors[pos.x][pos.y];
+                    const Color& originalColor = originalBoardColors[pos.x][pos.y];
+
+                    printf("Current Color: (%d, %d, %d, %d)\n", currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+                    printf("Original Color: (%d, %d, %d, %d)\n", originalColor.r, originalColor.g, originalColor.b, originalColor.a);
+
+                    if (currentColor.r != GRAY.r || currentColor.g != GRAY.g ||
+                        currentColor.b != GRAY.b || currentColor.a != GRAY.a) {
+                        if (currentColor.r != originalColor.r || currentColor.g != originalColor.g ||
+                            currentColor.b != originalColor.b || currentColor.a != originalColor.a) {
+                            boardColors[pos.x][pos.y] = ColorOverlay(originalBoardColors[pos.y][pos.x], GREEN, 0.5f);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+*/
+
     void RenderChessBoard(){
         std::vector<std::vector<Color>> boardColors(8, std::vector<Color>(8, WHITE));
         boardColorsSet(boardColors);
+        highlightPossiblePositionsForCurrentPiece(boardColors);
 
         for (auto i = 0; i < 8; i++)
         {
             for (auto j = 0; j < 8; j++)
             {
                 DrawRectangle(i*tile_size, j*tile_size, tile_size, tile_size, boardColors[i][j]);
+                // Draw Borders for all the Chess Tiles
+                DrawRectangleLines(i * tile_size, j * tile_size, tile_size, tile_size, BLACK);
             }
         }
     }

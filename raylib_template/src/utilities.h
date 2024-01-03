@@ -23,6 +23,7 @@ namespace Utilities_N{
 
     extern ChessPiece* selectedPiece;
     extern std::vector<c_pieces> pieces;
+    extern std::vector<std::vector<Color>> originalBoardColors;
     extern int index;
     extern int turnCount;
 
@@ -68,6 +69,7 @@ namespace Utilities_N{
     inline Rectangle sourceRectPawn;
 
     void boardColorsSet(std::vector<std::vector<Color>>& boardColors);
+    void highlightPossiblePositionsForCurrentPiece(std::vector<std::vector<Color>>& boardColors);
     void RenderChessBoard();
     void InitTextures();
     void UnloadTextures();
